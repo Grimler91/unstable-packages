@@ -1,0 +1,61 @@
+diff -uNr Electrum-3.3.6/electrum/daemon.py Electrum-3.3.6.mod/electrum/daemon.py
+--- Electrum-3.3.6/electrum/daemon.py	2019-05-16 20:00:49.000000000 +0300
++++ Electrum-3.3.6.mod/electrum/daemon.py	2019-05-20 01:47:47.246158554 +0300
+@@ -342,7 +342,7 @@
+ 
+     def init_gui(self, config, plugins):
+         threading.current_thread().setName('GUI')
+-        gui_name = config.get('gui', 'qt')
++        gui_name = config.get('gui', 'text')
+         if gui_name in ['lite', 'classic']:
+             gui_name = 'qt'
+         gui = __import__('electrum.gui.' + gui_name, fromlist=['electrum'])
+diff -uNr Electrum-3.3.6/electrum/electrum Electrum-3.3.6.mod/electrum/electrum
+--- Electrum-3.3.6/electrum/electrum	2019-05-16 20:00:49.000000000 +0300
++++ Electrum-3.3.6.mod/electrum/electrum	2019-05-20 01:47:47.247158559 +0300
+@@ -40,7 +40,7 @@
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_bundle = getattr(sys, 'frozen', False)
+ is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ 
+ # move this back to gui/kivy/__init.py once plugins are moved
+ os.environ['KIVY_DATA_DIR'] = os.path.abspath(os.path.dirname(__file__)) + '/electrum/gui/kivy/data/'
+diff -uNr Electrum-3.3.6/electrum/util.py Electrum-3.3.6.mod/electrum/util.py
+--- Electrum-3.3.6/electrum/util.py	2019-05-16 20:00:49.000000000 +0300
++++ Electrum-3.3.6.mod/electrum/util.py	2019-05-20 01:48:06.973263531 +0300
+@@ -305,10 +305,6 @@
+             self.running = False
+ 
+     def on_stop(self):
+-        if 'ANDROID_DATA' in os.environ:
+-            import jnius
+-            jnius.detach()
+-            self.logger.info("jnius detach")
+         self.logger.info("stopped")
+ 
+ 
+@@ -469,9 +465,7 @@
+ 
+ 
+ def user_dir():
+-    if 'ANDROID_DATA' in os.environ:
+-        return android_data_dir()
+-    elif os.name == 'posix':
++    if os.name == 'posix':
+         return os.path.join(os.environ["HOME"], ".electrum")
+     elif "APPDATA" in os.environ:
+         return os.path.join(os.environ["APPDATA"], "Electrum")
+diff -uNr Electrum-3.3.6/run_electrum Electrum-3.3.6.mod/run_electrum
+--- Electrum-3.3.6/run_electrum	2019-05-16 20:00:49.000000000 +0300
++++ Electrum-3.3.6.mod/run_electrum	2019-05-20 01:47:47.247158559 +0300
+@@ -40,7 +40,7 @@
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_bundle = getattr(sys, 'frozen', False)
+ is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ 
+ # move this back to gui/kivy/__init.py once plugins are moved
+ os.environ['KIVY_DATA_DIR'] = os.path.abspath(os.path.dirname(__file__)) + '/electrum/gui/kivy/data/'
